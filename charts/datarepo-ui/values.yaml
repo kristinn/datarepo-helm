@@ -18,6 +18,9 @@ proxyPass:
 ## Extra environment variables that will be pass onto deployment pods
 env: {}
 
+## Pod nginx port
+nginxport: 8080
+
 ## Pod annotations
 podAnnotations: {}
 
@@ -49,4 +52,4 @@ rbac:
 
 service:
   type: ClusterIP
-  port: 80
+  port: 8080
