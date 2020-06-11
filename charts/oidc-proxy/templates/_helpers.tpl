@@ -3,7 +3,7 @@
 Expand the name of the chart.
 */}}
 {{- define "oidc-proxy.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
+{{- default .Chart.Name .Values.oidc.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
@@ -12,10 +12,10 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 If release name contains chart name it will be used as a full name.
 */}}
 {{- define "oidc-proxy.fullname" -}}
-{{- if .Values.fullnameOverride -}}
-{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- if .Values.oidc.fullnameOverride -}}
+{{- .Values.oidc.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
-{{- $name := default .Chart.Name .Values.nameOverride -}}
+{{- $name := default .Chart.Name .Values.oidc.nameOverride -}}
 {{- if contains $name .Release.Name -}}
 {{- .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -57,10 +57,10 @@ app.kubernetes.io/part-of: terra
 Create the name of the service account to use
 */}}
 {{- define "oidc-proxy.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create -}}
-    {{ default (include "oidc-proxy.fullname" .) .Values.serviceAccount.name }}
+{{- if .Values.oidc.serviceAccount.create -}}
+    {{ default (include "oidc-proxy.fullname" .) .Values.oidc.serviceAccount.name }}
 {{- else -}}
-    {{ default "default" .Values.serviceAccount.name }}
+    {{ default "default" .Values.oidc.serviceAccount.name }}
 {{- end -}}
 {{- end -}}
 
@@ -69,12 +69,12 @@ Create the name of the service account to use
 Generate the secret name
 */}}
 {{- define "oidc-proxy.secretName" -}}
-{{ default (include "oidc-proxy.fullname" .) .Values.existingTlsSecret }}
+{{ default (include "oidc-proxy.fullname" .) .Values.oidc.existingTlsSecret }}
 {{- end -}}
 
 {{/*
 Check if any type of credentials are defined
 */}}
 {{- define "oidc-proxy.hasCredentials" -}}
-{{ .Values.existingTlsSecret -}}
+{{ .Values.oidc.existingTlsSecret -}}
 {{- end -}}

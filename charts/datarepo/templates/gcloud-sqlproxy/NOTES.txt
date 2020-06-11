@@ -12,7 +12,7 @@ All pods do not go to the running state if valid credentials are not available.
 
 {{- end }}
 
-{{- if eq (index .Values.sqlproxy.cloudsql.instances 0).instance "instance" }}
+{{- if eq (index .Values.gcloud-sqlproxy.cloudsql.instances 0).instance "instance" }}
 
 ##############################################################################
 ####   ERROR: You did not provide Google Cloud instances.   ####
@@ -23,10 +23,10 @@ settings were not provided.
 
 {{- end }}
 
-{{- if ne (index .Values.sqlproxy.cloudsql.instances 0).instance "instance" }}
+{{- if ne (index .Values.gcloud-sqlproxy.cloudsql.instances 0).instance "instance" }}
 
 The SQL server instances can be accessed via ports:
-{{- range .Values.sqlproxy.cloudsql.instances }}
+{{- range .Values.gcloud-sqlproxy.cloudsql.instances }}
   - {{ .port }} ({{ .instance }})
 {{- end }}
 on the following DNS name from within your cluster:

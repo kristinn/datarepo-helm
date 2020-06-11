@@ -3,7 +3,7 @@
 Expand the name of the chart.
 */}}
 {{- define "datarepo-ui.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
+{{- default .Chart.Name .Values.ui.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
@@ -12,10 +12,10 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 If release name contains chart name it will be used as a full name.
 */}}
 {{- define "datarepo-ui.fullname" -}}
-{{- if .Values.fullnameOverride -}}
-{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- if .Values.ui.fullnameOverride -}}
+{{- .Values.ui.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
-{{- $name := default .Chart.Name .Values.nameOverride -}}
+{{- $name := default .Chart.Name .Values.ui.nameOverride -}}
 {{- if contains $name .Release.Name -}}
 {{- .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -57,9 +57,9 @@ app.kubernetes.io/part-of: terra
 Create the name of the service account to use
 */}}
 {{- define "datarepo-ui.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create -}}
-    {{ default (include "datarepo-ui.fullname" .) .Values.serviceAccount.name }}
+{{- if .Values.ui.serviceAccount.create -}}
+    {{ default (include "datarepo-ui.fullname" .) .Values.ui.serviceAccount.name }}
 {{- else -}}
-    {{ default "default" .Values.serviceAccount.name }}
+    {{ default "default" .Values.ui.serviceAccount.name }}
 {{- end -}}
 {{- end -}}

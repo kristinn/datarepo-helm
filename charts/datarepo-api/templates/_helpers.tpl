@@ -3,7 +3,7 @@
 Expand the name of the chart.
 */}}
 {{- define "datarepo-api.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
+{{- default .Chart.Name .Values.api.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
@@ -12,10 +12,10 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 If release name contains chart name it will be used as a full name.
 */}}
 {{- define "datarepo-api.fullname" -}}
-{{- if .Values.fullnameOverride -}}
-{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- if .Values.api.fullnameOverride -}}
+{{- .Values.api.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
-{{- $name := default .Chart.Name .Values.nameOverride -}}
+{{- $name := default .Chart.Name .Values.api.nameOverride -}}
 {{- if contains $name .Release.Name -}}
 {{- .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -57,10 +57,10 @@ app.kubernetes.io/part-of: terra
 Create the name of the service account to use
 */}}
 {{- define "datarepo-api.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create -}}
-    {{ default (include "datarepo-api.fullname" .) .Values.serviceAccount.name }}
+{{- if .Values.api.serviceAccount.create -}}
+    {{ default (include "datarepo-api.fullname" .) .Values.api.serviceAccount.name }}
 {{- else -}}
-    {{ default "default" .Values.serviceAccount.name }}
+    {{ default "default" .Values.api.serviceAccount.name }}
 {{- end -}}
 {{- end -}}
 
@@ -68,40 +68,40 @@ Create the name of the service account to use
 Generate existingDatarepoDbSecretKey key name in the secret
 */}}
 {{- define "datarepo-api.secretKeyDatarepoDb" -}}
-{{ default "datarepo-password" .Values.existingDatarepoDbSecretKey }}
+{{ default "datarepo-password" .Values.api.existingDatarepoDbSecretKey }}
 {{- end -}}
 
 {{/*
 Generate existingStairwayDbSecretKey key name in the secret
 */}}
 {{- define "datarepo-api.secretKeyStairwayDb" -}}
-{{ default "stairway-password" .Values.existingStairwayDbSecretKey }}
+{{ default "stairway-password" .Values.api.existingStairwayDbSecretKey }}
 {{- end -}}
 
 {{/*
 Generate existingServiceAccountSecretKey key name in the secret
 */}}
 {{- define "datarepo-api.secretKeyServiceAccount" -}}
-{{ default "credential-file-json" .Values.existingServiceAccountSecretKey }}
+{{ default "credential-file-json" .Values.api.existingServiceAccountSecretKey }}
 {{- end -}}
 
 {{/*
 Generate the secret name for DB
 */}}
 {{- define "datarepo-api.secretNameDB" -}}
-{{ default (include "datarepo-api.fullname" .) .Values.existingSecretDB }}
+{{ default (include "datarepo-api.fullname" .) .Values.api.existingSecretDB }}
 {{- end -}}
 
 {{/*
 Generate the secret name for SA
 */}}
 {{- define "datarepo-api.secretNameSA" -}}
-{{ default (include "datarepo-api.fullname" .) .Values.existingSecretSA }}
+{{ default (include "datarepo-api.fullname" .) .Values.api.existingSecretSA }}
 {{- end -}}
 
 {{/*
 Check if any type of credentials are defined
 */}}
 {{- define "datarepo-api.hasCredentials" -}}
-{{ or .Values.secretsgeneric.datarepoPassword ( or .Values.existingSecretDB .Values.existingSecretSA .Values.existingDatarepoDbSecretKey .Values.existingStairwayDbSecretKey .Values.existingServiceAccountSecretKey ) -}}
+{{ or .Values.api.secretsgeneric.datarepoPassword ( or .Values.api.existingSecretDB .Values.api.existingSecretSA .Values.api.existingDatarepoDbSecretKey .Values.api.existingStairwayDbSecretKey .Values.api.existingServiceAccountSecretKey ) -}}
 {{- end -}}

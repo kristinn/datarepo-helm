@@ -1,119 +1,299 @@
-### Required for a full Deployment of a datarepo
-### - datarepo-api
-### - oidc-proxy
-### - datarepo-ui
-### - gcloud-sqlproxy
-### - postgresql
+gobal:
+  appVersion: ""
 gcloud-sqlproxy:
-  enabled: false ## if true uncomment below
-  ##  serviceAccountKey: '{
-  ##  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  ##  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  ##  "client_email": "fake-sa@fake-datarepo.iam.gserviceaccount.com",
-  ##  "client_id": "7584w748w7",
-  ##  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/fake-sa%40fake-datarepo.iam.gserviceaccount.com",
-  ##  "private_key": "-----BEGIN PRIVATE KEY-----\fakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecer
-  ##  fakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecert
-  ##  fakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecert
-  ##  fakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecert",
-  ##  "project_id": "fake-jade-ms",
-  ##  "token_uri": "https://oauth2.googleapis.com/token",
-  ##  "type": "service_account"
-  ##  }'
-  ##  cloudsql:
-  ##    instances:
-  ##     ### GCP instance name.
-  ##    - instance: "jade-postgres-101-fake"
-  ##     ### GCP project where the instance exists.
-  ##      project: "fake-jade-ms"
-  ##     ### GCP region where the instance exists.
-  ##      region: "us-central1"
-  ##     ### Port number for the proxy to expose for this instance.
-  ##      port: 5432
-  ##  rbac:
-  ##    create: true
-  ##  networkPolicy:
-  ##    enabled: false
-
+  image: gcr.io/cloudsql-docker/gce-proxy
+  imageTag: "1.17"
+  imagePullPolicy: IfNotPresent
+  replicasCount: 1
+  googleServiceAccount: ""
+  serviceAccountKey: ""
+  existingSecret: ""
+  existingSecretKey: ""
+  serviceAccountName: ""
+  usingGCPController: ""
+  cloudsql:
+    instances:
+    - instance: "instance"
+      instanceShortName: ""
+      project: "project"
+      region: "region"
+      port: 5432
+  rbac:
+    create: false
+  service:
+    type: ClusterIP
+    internalLB: false
+  networkPolicy:
+    enabled: true
+    ingress:
+      from: []
+  resources: {}
+  autoscaling:
+    enabled: false
+  terminationGracePeriodSeconds: 30
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  lifecycleHooks: {}
+  podDisruptionBudget: |
+    maxUnavailable: 1
+  extraArgs: {}
 datarepo-api:
-  enabled: false ## if true uncomment below
-  ##  image:
-  ##    version: fake-jade-ms_2019-12-05_13-20-26
-  ##  env:
-  ##    googleProjectid:  fake-jade-ms
-  ##    dbDatarepoUsername:  fakemanager
-  ##    springProfilesActive:  google,cloudsql,ms
-  ##    dbStairwayUsername:  fakemanager
-  ##    dbStairwayUri: jdbc:postgresql://jade-gcloud-sqlproxy.wholedeploy:5432/datarepo
-  ##    dbDatarepoUri: jdbc:postgresql://jade-gcloud-sqlproxy.wholedeploy:5432/stairway
-  ##  serviceAccount:
-  ##    create: true
-  ##  rbac:
-  ##    create: true
-  ##    pspEnabled: true
-  ##  secretsgeneric:
-  ##    existingSecret: true
-  ##    datarepoPassword: fakedbpassword
-  ##    stairwayPassword: fakedbpassword
-  ##    credentialFileJson: '{
-  ##  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  ##  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  ##  "client_email": "fake-k8-sa@broad-jade-dev.iam.gserviceaccount.com",
-  ##  "client_id": "84e8748w74",
-  ##  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/fake-k8-sa%40fake-jade-dev.iam.gserviceaccount.com",
-  ##  "private_key": "-----BEGIN PRIVATE KEY-----\fakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecer
-  ##  fakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecert
-  ##  fakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecert
-  ##  fakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecertfakecert",
-  ##  "project_id": "fake-jade-dev",
-  ##  "token_uri": "https://oauth2.googleapis.com/token",
-  ##  "type": "service_account"
-  ##  }'
-
+  replicaCount: 1
+  shutdownTimeoutSeconds: 60
+  image:
+    repository: gcr.io/broad-jade-dev/jade-data-repo
+    tag: ca9bd61-develop
+    pullPolicy: IfNotPresent
+    port: 8080
+  env: {}
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  resources: {}
+  serviceAccount:
+    create: false
+    name:
+  rbac:
+    create: false
+  service:
+    port: 8080
+    type: ClusterIP
+  secretsgeneric:
+    datarepoPassword: ""
+    stairwayPassword: ""
+    serivceAccountCredentialFileJson: ""
+  existingSecretDB: ""
+  existingDatarepoDbSecretKey: ""
+  existingStairwayDbSecretKey: ""
+  existingSecretSA: ""
+  existingServiceAccountSecretKey: ""
 datarepo-ui:
-  enabled: false ## if true uncomment below
-  ##  image:
-  ##    version: fake-jade-ms_2019-12-05_13-23-33
-  ##  proxyPass:
-  ##    status: http://jade-datarepo-api.wholedeploy:8080/status
-  ##    swagger: http://jade-datarepo-api.wholedeploy:8080/swagger-ui.html
-  ##    api: http://jade-datarepo-api.wholedeploy:8080
-  ##  serviceAccount:
-  ##    create: true
-  ##  rbac:
-  ##    create: true
-
+  replicaCount: 1
+  image:
+    repository: gcr.io/broad-jade-dev/jade-data-repo-ui
+    tag: broad-jade-my_2020-02-14_15-04-11
+    pullPolicy: IfNotPresent
+  nginxport: 8080
+  proxyPass:
+    status:
+    shutdown:
+    swagger:
+    api:
+  env: {}
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  resources: {}
+  serviceAccount:
+    create: false
+    name:
+  rbac:
+    create: true
+  service:
+    type: ClusterIP
+    port: 8080
+oidcproxy:
+  replicaCount: 1
+  image:
+    repository: broadinstitute/openidc-proxy
+    version: bernick_tcell
+    pullPolicy: IfNotPresent
+  env: {}
+  podAnnotations: {}
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  resources: {}
+  serviceAccount:
+    create: false
+    name:
+  rbac:
+    create: false
+  service:
+    type: NodePort
+    port: 80
+  ingress:
+    enabled: true
+    annotations: {}
+    domainName: ""
+    timeoutSec: 600
+    ingressAllowHttp: false
+    paths:
+    - /*
+    hosts: []
+    tls: []
 oidc-proxy:
-  enabled: false ## if true uncomment below
-  ##  env:
-  ##    proxyUrl: http://jade-datarepo-ui.wholedeploy:80/
-  ##    proxyUrl2: http://jade-datarepo-api.wholedeploy:8080/api
-  ##    proxyUrl3: http://jade-datarepo-api.wholedeploy:8080/register
-  ##    logLevel: debug
-  ##    serverName: jade.datarepo-dev.broadinstitute.org
-  ##    remoteUserClaim: sub
-  ##    enableStackdriver: yes
-  ##    filter2: AddOutputFilterByType DEFLATE application/json text/plain text/html application/javascript application/x-javascript
-  ##  ingress:
-  ##    enabled: true
-  ##    annotations:
-  ##      globalStaticIpName: fake-k8-100
-  ##  serviceAccount:
-  ##    create: true
-  ##  rbac:
-  ##    create: true
-  ##    pspEnabled: true
-  ##  secretsgeneric:
-  ##    enabled: true
-  ##    tlsKey: |-
-  ##      -----BEGIN PRIVATE KEY-----
-  ##      faketlscert
-  ##      -----END PRIVATE KEY-----
-  ##    tlsCert: |-
-  ##      -----BEGIN CERTIFICATE-----
-  ##      faketlscert
-  ##      -----END CERTIFICATE-----
-
-postgresql: # supply your Gcloudsql instance or use this
-  enabled: false
-## https://github.com/helm/charts/tree/master/stable/postgresql
+  replicaCount: 1
+  image:
+    repository: broadinstitute/openidc-proxy
+    version: bernick_tcell
+    pullPolicy: IfNotPresent
+  env: {}
+  podAnnotations: {}
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  resources: {}
+  serviceAccount:
+    create: false
+    name:
+  rbac:
+    create: false
+  service:
+    type: NodePort
+    port: 80
+  ingress:
+    enabled: true
+    annotations: {}
+    domainName: ""
+    timeoutSec: 600
+    ingressAllowHttp: false
+    paths:
+    - /*
+    hosts: []
+    tls: []
+sqlproxy:
+  image: gcr.io/cloudsql-docker/gce-proxy
+  imageTag: "1.17"
+  imagePullPolicy: IfNotPresent
+  replicasCount: 1
+  googleServiceAccount: ""
+  serviceAccountKey: ""
+  existingSecret: ""
+  existingSecretKey: ""
+  serviceAccountName: ""
+  usingGCPController: ""
+  cloudsql:
+    instances:
+    - instance: "instance"
+      instanceShortName: ""
+      project: "project"
+      region: "region"
+      port: 5432
+  rbac:
+    create: false
+  service:
+    type: ClusterIP
+    internalLB: false
+  networkPolicy:
+    enabled: true
+    ingress:
+      from: []
+  resources: {}
+  autoscaling:
+    enabled: false
+  terminationGracePeriodSeconds: 30
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  lifecycleHooks: {}
+  podDisruptionBudget: |
+    maxUnavailable: 1
+  extraArgs: {}
+api:
+  replicaCount: 1
+  shutdownTimeoutSeconds: 60
+  image:
+    repository: gcr.io/broad-jade-dev/jade-data-repo
+    tag: ca9bd61-develop
+    pullPolicy: IfNotPresent
+    port: 8080
+  env: {}
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  resources: {}
+  serviceAccount:
+    create: false
+    name:
+  rbac:
+    create: false
+  service:
+    port: 8080
+    type: ClusterIP
+  secretsgeneric:
+    datarepoPassword: ""
+    stairwayPassword: ""
+    serivceAccountCredentialFileJson: ""
+  existingSecretDB: ""
+  existingDatarepoDbSecretKey: ""
+  existingStairwayDbSecretKey: ""
+  existingSecretSA: ""
+  existingServiceAccountSecretKey: ""
+ui:
+  replicaCount: 1
+  image:
+    repository: gcr.io/broad-jade-dev/jade-data-repo-ui
+    tag: broad-jade-my_2020-02-14_15-04-11
+    pullPolicy: IfNotPresent
+  nginxport: 8080
+  proxyPass:
+    status:
+    shutdown:
+    swagger:
+    api:
+  env: {}
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  resources: {}
+  serviceAccount:
+    create: false
+    name:
+  rbac:
+    create: true
+  service:
+    type: ClusterIP
+    port: 8080
+oidc:
+  replicaCount: 1
+  image:
+    repository: broadinstitute/openidc-proxy
+    version: bernick_tcell
+    pullPolicy: IfNotPresent
+  env: {}
+  podAnnotations: {}
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  resources: {}
+  serviceAccount:
+    create: false
+    name:
+  rbac:
+    create: false
+  service:
+    type: NodePort
+    port: 80
+  ingress:
+    enabled: true
+    annotations: {}
+    domainName: ""
+    timeoutSec: 600
+    ingressAllowHttp: false
+    paths:
+    - /*
+    hosts: []
+    tls: []

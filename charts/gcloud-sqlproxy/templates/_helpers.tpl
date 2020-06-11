@@ -3,7 +3,7 @@
 Expand the name of the chart.
 */}}
 {{- define "gcloud-sqlproxy.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
+{{- default .Chart.Name .Values.sqlproxy.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
@@ -12,10 +12,10 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 If release name contains chart name it will be used as a full name.
 */}}
 {{- define "gcloud-sqlproxy.fullname" -}}
-{{- if .Values.fullnameOverride -}}
-{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- if .Values.sqlproxy.fullnameOverride -}}
+{{- .Values.sqlproxy.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
-{{- $name := default .Chart.Name .Values.nameOverride -}}
+{{- $name := default .Chart.Name .Values.sqlproxy.nameOverride -}}
 {{- if contains $name .Release.Name -}}
 {{- .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -35,26 +35,26 @@ Create chart name and version as used by the chart label.
 Generate gcp service account name
 */}}
 {{- define "gcloud-sqlproxy.serviceAccountName" -}}
-{{ default (include "gcloud-sqlproxy.fullname" .) .Values.serviceAccountName }}
+{{ default (include "gcloud-sqlproxy.fullname" .) .Values.sqlproxy.serviceAccountName }}
 {{- end -}}
 
 {{/*
 Generate key name in the secret
 */}}
 {{- define "gcloud-sqlproxy.secretKey" -}}
-{{ default "credentials.json" .Values.existingSecretKey }}
+{{ default "credentials.json" .Values.sqlproxy.existingSecretKey }}
 {{- end -}}
 
 {{/*
 Generate the secret name
 */}}
 {{- define "gcloud-sqlproxy.secretName" -}}
-{{ default (include "gcloud-sqlproxy.fullname" .) .Values.existingSecret }}
+{{ default (include "gcloud-sqlproxy.fullname" .) .Values.sqlproxy.existingSecret }}
 {{- end -}}
 
 {{/*
 Check if any type of credentials are defined
 */}}
 {{- define "gcloud-sqlproxy.hasCredentials" -}}
-{{ or .Values.serviceAccountKey ( or .Values.existingSecret .Values.usingGCPController ) -}}
+{{ or .Values.sqlproxy.serviceAccountKey ( or .Values.sqlproxy.existingSecret .Values.sqlproxy.usingGCPController ) -}}
 {{- end -}}
